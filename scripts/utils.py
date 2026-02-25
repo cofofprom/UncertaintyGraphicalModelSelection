@@ -19,6 +19,18 @@ def generateDominantDiagonal(dim, density):
 
     return prec
 
+def generateDiagonalShift(dim, density):
+    graph = nx.gnp_random_graph(dim, density)
+    adj = nx.adjacency_matrix(graph).toarray()
+
+    A = np.random.uniform(0.5, 1, size=(dim, dim))
+    B = np.random.choice([-1, 1], size=(dim, dim))
+
+    prec = adj * A * B
+    prec = (prec + prec.T) / 2
+
+    return prec
+
 def matrix2Edges(mat):
     triu = mat[np.triu_indices_from(mat, k=1)]
     return (triu != 0.).astype(np.uint64)

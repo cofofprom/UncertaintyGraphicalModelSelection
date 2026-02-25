@@ -33,7 +33,7 @@ def evaluateSingleModel(model, config):
 
 def evaluateSetOfModels(config):
     result = []
-    for d in np.logspace(0.1, 0.9, 10):
+    for d in np.logspace(-3, -1, 30):
         for n_model in range(config['S_sg']):
             model = TensorGraphicalModel(config['dims'], [d for _ in range(config['order'])])
 
