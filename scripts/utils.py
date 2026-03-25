@@ -28,6 +28,13 @@ def generateDiagonalShift(dim, density):
 
     prec = adj * A * B
     prec = (prec + prec.T) / 2
+    min_eigenvalue = np.min(np.linalg.eigvalsh(prec))
+    prec = prec + np.eye(dim) * (np.abs(min_eigenvalue) + 0.1)
+
+    diag = np.diag(prec).copy()
+    diag[diag <= 1e-12] = 1e-12
+    scale = np.sqrt(diag)
+    prec = prec / np.outer(scale, scale)
 
     return prec
 
