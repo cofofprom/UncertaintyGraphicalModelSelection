@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 from sklearn.metrics import confusion_matrix
+from sklearn.datasets import make_sparse_spd_matrix
 from scipy.stats import hmean
 
 def generateDominantDiagonal(dim, density):
@@ -37,6 +38,9 @@ def generateDiagonalShift(dim, density):
     prec = prec / np.outer(scale, scale)
 
     return prec
+
+def generateCholesky(dim, density):
+    return make_sparse_spd_matrix(dim, alpha=1 - density, norm_diag=True)
 
 def matrix2Edges(mat):
     triu = mat[np.triu_indices_from(mat, k=1)]
