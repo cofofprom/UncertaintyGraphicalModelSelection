@@ -39,7 +39,7 @@ def generateDiagonalShift(dim, density):
 
     return prec
 
-def generateCholesky(dim, density):
+def generateCholesky(dim, param):
     return make_sparse_spd_matrix(dim, alpha=1 - density, norm_diag=True)
 
 def matrix2Edges(mat):

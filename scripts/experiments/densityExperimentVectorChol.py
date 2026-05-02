@@ -7,7 +7,12 @@ import json
 import numpy as np
 import pandas as pd
 import uuid
+import pickle
+from sklearn.datasets import make_sparse_spd_matrix
 
+chol_mapping = None
+def generateCholesky(dim, density):
+    return make_sparse_spd_matrix(dim, alpha=chol_mapping(density).item(), norm_diag=True)
 
 def evaluateSingleModel(model, config):
     result = []
@@ -60,6 +65,10 @@ def main():
 
     with open(os.path.join(args.experiment_dir, 'config.json'), 'r') as f:
         config = json.load(f)
+
+    with open(os.path.join(args.experiment_dir, 'chol_mapping.pickle'), 'rb') as f:
+        global chol_mapping
+        chol_mapping = pickle.load(f)
 
     result_df = evaluateSetOfModels(config)
 
