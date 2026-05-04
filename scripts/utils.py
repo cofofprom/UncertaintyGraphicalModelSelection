@@ -39,6 +39,24 @@ def generateDiagonalShift(dim, density):
 
     return prec
 
+def generateNormalDiagonalShift(dim, density, sigma=1):
+    graph = nx.gnp_random_graph(dim, density)
+    adj = nx.adjacency_matrix(graph).toarray()
+
+    A = np.random.normal(0, sigma, size=(dim, dim))
+
+    prec = adj * A
+    prec = (prec + prec.T) / 2
+    min_eigenvalue = np.real(np.min(np.linalg.eigvalsh(prec)))
+    prec = prec + np.eye(dim) * (np.abs(min_eigenvalue) + 0.1)
+
+    diag = np.diag(prec).copy()
+    diag[diag <= 1e-12] = 1e-12
+    scale = np.sqrt(diag)
+    prec = prec / np.outer(scale, scale)
+
+    return prec
+
 def generateCholesky(dim, param):
     return make_sparse_spd_matrix(dim, alpha=1 - density, norm_diag=True)
 
