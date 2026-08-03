@@ -103,6 +103,43 @@ def _holm_rejections(pvalues, alpha):
     return rejected
 
 
+def _benjamini_hochberg_rejections(pvalues, alpha):
+    n_hyp = len(pvalues)
+    rejected = np.zeros(n_hyp, dtype=bool)
+
+    if n_hyp == 0:
+        return rejected
+
+    ordered_pvalues = np.sort(pvalues)
+    thresholds = alpha * np.arange(1, n_hyp + 1) / n_hyp
+    qualifying = ordered_pvalues <= thresholds
+
+    if np.any(qualifying):
+        cutoff = ordered_pvalues[np.nonzero(qualifying)[0][-1]]
+        rejected = pvalues <= cutoff
+
+    return rejected
+
+
+def _benjamini_yekutieli_rejections(pvalues, alpha):
+    n_hyp = len(pvalues)
+    rejected = np.zeros(n_hyp, dtype=bool)
+
+    if n_hyp == 0:
+        return rejected
+
+    ordered_pvalues = np.sort(pvalues)
+    harmonic_number = np.sum(1. / np.arange(1, n_hyp + 1))
+    thresholds = alpha * np.arange(1, n_hyp + 1) / (n_hyp * harmonic_number)
+    qualifying = ordered_pvalues <= thresholds
+
+    if np.any(qualifying):
+        cutoff = ordered_pvalues[np.nonzero(qualifying)[0][-1]]
+        rejected = pvalues <= cutoff
+
+    return rejected
+
+
 def multipleTesting(data, alpha, correction='SI'):
     data = np.asarray(data, dtype=np.float64)
 
@@ -149,10 +186,16 @@ def multipleTesting(data, alpha, correction='SI'):
     correction_key = correction.upper()
     if correction_key == 'SI':
         selected_edges = pvalues < alpha
+    elif correction_key == 'B':
+        selected_edges = pvalues < alpha / n_edges
+    elif correction_key == 'BH':
+        selected_edges = _benjamini_hochberg_rejections(pvalues, alpha)
+    elif correction_key == 'BY':
+        selected_edges = _benjamini_yekutieli_rejections(pvalues, alpha)
     elif correction_key == 'H':
         selected_edges = _holm_rejections(pvalues, alpha)
     else:
-        raise ValueError("correction has to be either 'SI' or 'H'")
+        raise ValueError("correction has to be either 'SI', 'B', 'BH', 'BY', or 'H'")
 
     return selected_edges.astype(np.uint64)
         
