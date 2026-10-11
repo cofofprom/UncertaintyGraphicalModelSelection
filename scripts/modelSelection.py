@@ -146,8 +146,8 @@ def multipleTesting(data, alpha, correction='SI'):
     if data.ndim != 2:
         raise ValueError("data has to be a 2D array of shape (n_samples, dim)")
 
-    if not 0 < alpha < 1:
-        raise ValueError("alpha has to belong to the interval (0, 1)")
+    # if not 0 < alpha < 1:
+    #     raise ValueError("alpha has to belong to the interval (0, 1)")
 
     n_samples, dim = data.shape
 

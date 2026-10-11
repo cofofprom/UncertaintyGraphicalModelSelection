@@ -57,8 +57,13 @@ def generateNormalDiagonalShift(dim, density, sigma=1):
 
     return prec
 
-def generateCholesky(dim, param):
+def generateCholesky(dim, density):
     return make_sparse_spd_matrix(dim, alpha=1 - density, norm_diag=True)
+
+def generateFixedValue(dim, density, c=0.1):
+    graph = nx.gnp_random_graph(dim, density)
+    adj = nx.adjacency_matrix(graph).toarray()
+    return np.eye(dim) + c / (dim - 1) * adj
 
 def matrix2Edges(mat):
     triu = mat[np.triu_indices_from(mat, k=1)]
