@@ -102,6 +102,29 @@ def _holm_rejections(pvalues, alpha):
 
     return rejected
 
+def _modified_holm_rejections(pvalues, alpha, n_true_edges):
+    n_hyp = len(pvalues)
+    rejected = np.zeros(n_hyp, dtype=bool)
+
+    if not 0 <= n_true_edges <= n_hyp:
+        raise ValueError("Invalid number of true edges")
+
+    m0 = n_hyp - n_true_edges
+
+    if m0 == 0:
+        return np.ones(n_hyp, dtype=bool)
+
+    order = np.argsort(pvalues)
+
+    for rank, idx in enumerate(order):
+        threshold = alpha / min(m0, n_hyp - rank)
+
+        if pvalues[idx] <= threshold:
+            rejected[idx] = True
+        else:
+            break
+
+    return rejected
 
 def _benjamini_hochberg_rejections(pvalues, alpha):
     n_hyp = len(pvalues)
@@ -140,7 +163,7 @@ def _benjamini_yekutieli_rejections(pvalues, alpha):
     return rejected
 
 
-def multipleTesting(data, alpha, correction='SI'):
+def multipleTesting(data, alpha, correction='SI', n_true_edges=None):
     data = np.asarray(data, dtype=np.float64)
 
     if data.ndim != 2:
@@ -194,6 +217,11 @@ def multipleTesting(data, alpha, correction='SI'):
         selected_edges = _benjamini_yekutieli_rejections(pvalues, alpha)
     elif correction_key == 'H':
         selected_edges = _holm_rejections(pvalues, alpha)
+    elif correction_key == 'MH':
+        if n_true_edges is None:
+            raise ValueError("n_true_edges is required for modified Holm")
+        
+        selected_edges = _modified_holm_rejections(pvalues, alpha, n_true_edges)
     else:
         raise ValueError("correction has to be either 'SI', 'B', 'BH', 'BY', or 'H'")
 
