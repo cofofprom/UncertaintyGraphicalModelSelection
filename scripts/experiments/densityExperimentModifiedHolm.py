@@ -9,7 +9,6 @@ import pandas as pd
 import uuid
 
 
-CORRECTIONS = ('SI', 'B', 'H', 'BH', 'BY')
 METRIC_COLUMNS = [
     'tn', 'fp', 'fn', 'tp', 'fdr', 'fomr', 'tpr', 'tnr', 'ba', 'f1', 'mcc',
     'correction',
@@ -23,11 +22,10 @@ def evaluateSingleModel(model, config):
     for n_repl in range(config['S_obs']):
         data = model.rvs(config['n_samples'])
 
-        for correction in CORRECTIONS:
-            pred_edges = multipleTesting(data, config['alpha'], correction='MH', n_true_edges=np.sum(true_edges))
-            metrics = evaluate(true_edges, pred_edges)
-            metrics.append(correction)
-            result.append(metrics)
+        pred_edges = multipleTesting(data, config['alpha'], correction='MH', n_true_edges=np.sum(true_edges))
+        metrics = evaluate(true_edges, pred_edges)
+        metrics.append('MH')
+        result.append(metrics)
 
     return pd.DataFrame(result, columns=METRIC_COLUMNS)
 

@@ -1,6 +1,6 @@
 from model import VectorGraphicalModel
 from modelSelection import multipleTesting
-from utils import matrix2Edges, evaluate, generateFixedValue
+from utils import matrix2Edges, evaluate, generateArbitraryGE
 import argparse
 import os
 import json
@@ -31,13 +31,12 @@ def evaluateSingleModel(model, config):
 
     return pd.DataFrame(result, columns=METRIC_COLUMNS)
 
-
 def evaluateSetOfModels(config):
     result = []
     for d in np.linspace(0.1, 0.9, 10):
         for n_model in range(config['S_sg']):
             model = VectorGraphicalModel(config['dim'], d,
-                                         precision_generate_fn=generateFixedValue)
+                                         precision_generate_fn=generateArbitraryGE)
 
             single_results = evaluateSingleModel(model, config)
             single_results['d'] = d
